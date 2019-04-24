@@ -5,11 +5,16 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
  *     itemOperations={"get"},
- *     collectionOperations={"get"}
+ *     collectionOperations={"get",
+ *     "post" = {
+ *     "access_control"="is_granted('IS_AUTHENTICATED_FULLY')"
+ *        }
+ *     }
  *
  * )
  * @ORM\Entity(repositoryClass="App\Repository\BlogPostRepository")
@@ -25,16 +30,21 @@ class BlogPost
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\NotBlank()
      */
     private $title;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Assert\NotBlank()
+     * @Assert\DateTime()
      */
     private $published;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\NotBlank()
+     * @Assert\Length(min="5",max="500")
      */
     private $content;
 
@@ -44,9 +54,9 @@ class BlogPost
      */
     private $author;
 
-
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\NotBlank()
      */
     private $slug;
 
