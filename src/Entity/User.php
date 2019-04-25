@@ -13,13 +13,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
- *     itemOperations={"get"= {"access_control"="is_granted('IS_AUTHENTICATED_FULLY')"
+ *     itemOperations={"get"= {"access_control"="is_granted('IS_AUTHENTICATED_FULLY')",
+ *     normalizationContext={"groups"={"get"}
+ *        }
+ *      "put" = {"access_control"="is_granted('IS_AUTHENTICATED_FULLY') and object == user",
+ *          "denormalizationContext"={"groups"="put"}
  *      }
  *     },
- *     collectionOperations={"post"},
- *     normalizationContext={
-            "groups" = {"read"}
+ *     collectionOperations={"post"={
+ *     "denormalizationContext"={
+ *          "groups"={"post"}
  *     }
+ *      }
+ *     },
  * )
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @UniqueEntity(fields={"username","email"})
@@ -36,13 +42,14 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"reads"})
+     * @Groups({"reads","post"})
      * @Assert\NotBlank()
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"put","post"})
      * @Assert\NotBlank()
      * @Assert\Regex(
      *     pattern="/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{7,}/",
@@ -53,6 +60,7 @@ class User implements UserInterface
 
 
     /**
+     * @Groups({"put","post"})
      * @Assert\NotBlank()
      * @Assert\Expression(
      *     "this.getPassword() == this.getRetypedPassword()",
@@ -70,7 +78,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"reads"})
+     * @Groups({"post","put"})
      * @Assert\NotBlank()
      * @Assert\Email()
      */
