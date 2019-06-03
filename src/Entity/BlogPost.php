@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -22,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * )
  * @ORM\Entity(repositoryClass="App\Repository\BlogPostRepository")
  */
-class BlogPost
+class BlogPost implements AuthoredEntityInterface
 {
     /**
      * @ORM\Id()
@@ -121,11 +122,10 @@ class BlogPost
     {
         return $this->author;
     }
-
     /**
-     * @param User $author
+     * @param UserInterface $author
      */
-    public function setAuthor(User $author): void
+    public function setAuthor(UserInterface $author): AuthoredEntityInterface
     {
         $this->author = $author;
     }
