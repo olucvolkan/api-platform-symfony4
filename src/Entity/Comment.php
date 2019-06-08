@@ -88,9 +88,9 @@ class Comment implements AuthoredEntityInterface
     /**
      * @param mixed $published
      */
-    public function setPublished($published): void
+    public function setPublished(): void
     {
-        $this->published = $published;
+        $this->published = new \DateTime("now");
     }
 
     /**
@@ -107,6 +107,7 @@ class Comment implements AuthoredEntityInterface
     public function setAuthor(UserInterface $author): AuthoredEntityInterface
     {
         $this->author = $author;
+        return $this;
     }
 
     /**

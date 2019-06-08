@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -66,12 +67,14 @@ class BlogPost implements AuthoredEntityInterface
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Comment",mappedBy="blogPost")
+     * @ApiSubresource()
      */
     private $comment;
 
     public function __construct()
     {
         $this->comment = new ArrayCollection();
+        $this->published = new \DateTime("now");
     }
 
     public function getId(): ?int
@@ -91,14 +94,14 @@ class BlogPost implements AuthoredEntityInterface
         return $this;
     }
 
-    public function getPublished(): ?\DateTimeInterface
+    public function getPublished()
     {
         return $this->published;
     }
 
-    public function setPublished(?\DateTimeInterface $published): self
+    public function setPublished()
     {
-        $this->published = $published;
+        $this->published = new \DateTime("now");
 
         return $this;
     }
@@ -122,12 +125,15 @@ class BlogPost implements AuthoredEntityInterface
     {
         return $this->author;
     }
+
     /**
-     * @param UserInterface $author
+     * @param UserInterface $user
+     * @return AuthoredEntityInterface
      */
-    public function setAuthor(UserInterface $author): AuthoredEntityInterface
+    public function setAuthor(UserInterface $user): AuthoredEntityInterface
     {
-        $this->author = $author;
+        $this->author = $user;
+        return $this;
     }
 
     /**
