@@ -40,13 +40,13 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"reads"})
+     * @Groups({"get"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"reads","post"})
+     * @Groups({"get","post","get-comment-with-author"})
      * @Assert\NotBlank()
      */
     private $username;
@@ -76,7 +76,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"reads"})
+     * @Groups({"get","get-comment-with-author"})
      */
     private $fullname;
 
@@ -96,7 +96,7 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Comment",mappedBy="author")
-     * @Groups({"reads"})
+     * @Groups({"get"})
      */
     private $comment;
 
