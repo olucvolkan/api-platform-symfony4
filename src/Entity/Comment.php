@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      },
  *     "api_blog_posts_comments_get_subresource"= {
  *          "normalization_context"={
-            "groups"= {"get-comment-with-author"}
+ *           "groups"= {"get-comment-with-author"}
  *          }
  *      }
  *     },

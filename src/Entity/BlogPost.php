@@ -13,7 +13,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ApiResource(
  *     itemOperations={
- *     "get",
+ *     "get"={
+ *          "normalization_context"={
+ *           "groups"= {"get-blog-post-with-author"}
+ *          }
+ *
+ *     },
  *     "put" = {"access_control"="is_granted('IS_AUTHENTICATED_FULLY') and object.getAuthor() == user"}
  * },
  *     collectionOperations={"get",
@@ -31,12 +36,14 @@ class BlogPost implements AuthoredEntityInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"get-blog-post-with-author"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\NotBlank()
+     * @Groups({"post","get-blog-post-with-author"})
      */
     private $title;
 
@@ -51,25 +58,28 @@ class BlogPost implements AuthoredEntityInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\NotBlank()
      * @Assert\Length(min="5",max="500")
+     * @Groups({"post","get-blog-post-with-author"})
      */
     private $content;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User",inversedBy="post")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"post","get-blog-post-with-author"})
      */
     private $author;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\NotBlank()
-     * @Groups({"post"})
+     * @Groups({"post","get-blog-post-with-author"})
      */
     private $slug;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Comment",mappedBy="blogPost")
      * @ApiSubresource()
+     * @Groups({"get-blog-post-with-author"})
      */
     private $comment;
 
