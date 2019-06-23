@@ -36,6 +36,15 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class User implements UserInterface
 {
+
+    const ROLE_COMMENTATOR = "ROLE_COMMENTATOR";
+    const ROLE_ADMIN = "ROLE_ADMIN";
+    const ROLE_WRITER = "ROLE_WRITER";
+    const ROLE_EDITOR = "ROLE_EDITOR";
+    const ROLE_SUPER_ADMIN = "ROLE_SUPER_ADMIN";
+
+    const DEFAULT_ROLES = [self::ROLE_COMMENTATOR];
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -100,10 +109,18 @@ class User implements UserInterface
      */
     private $comment;
 
+    /**
+     * @var array
+     * @ORM\Column(type="simple_array",length=200 )
+     */
+    private $roles;
+
     public function __construct()
     {
         $this->post = new ArrayCollection();
         $this->comment = new ArrayCollection();
+        $this->roles = self::DEFAULT_ROLES;
+
     }
 
     public function getId(): ?int
@@ -208,10 +225,14 @@ class User implements UserInterface
     public function getRoles()
     {
 
-        return ['ROLE_USER'];
+        return $this->roles;
         // TODO: Implement getRoles() method.
     }
 
+    public function setRoles(array $roles){
+        $this->roles = $roles;
+
+    }
     /**
      * Returns the salt that was originally used to encode the password.
      *

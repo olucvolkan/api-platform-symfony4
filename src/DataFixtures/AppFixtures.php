@@ -23,11 +23,11 @@ class AppFixtures extends Fixture
     private $faker;
 
     private const USERS = [
-      ['username' => "admin2", 'email' => "admin2@gmail.com", 'name'=> 'Volkan Admin','password'=> "123456!"],
-        ['username' => "admin3", 'email' => "admin3@gmail.com", 'name'=> 'Admin3','password'=> "123456!"],
-        ['username' => "admin4", 'email' => "admin4@gmail.com", 'name'=> 'Admin4','password'=> "123456!"],
-        ['username' => "admin5", 'email' => "admin5@gmail.com", 'name'=> 'Admin5','password'=> "123456!"]
-    ];
+      ['username' => "admin2", 'email' => "admin2@gmail.com", 'name'=> 'Volkan Admin','password'=> "123456!",'roles'=> [User::ROLE_SUPER_ADMIN]],
+        ['username' => "admin3", 'email' => "admin3@gmail.com", 'name'=> 'Admin3','password'=> "123456!",'roles'=> [User::ROLE_ADMIN]],
+        ['username' => "admin4", 'email' => "admin4@gmail.com", 'name'=> 'Admin4','password'=> "123456!",'roles'=> [User::ROLE_WRITER]],
+        ['username' => "admin5", 'email' => "admin5@gmail.com", 'name'=> 'Admin5','password'=> "123456!",'roles'=> [User::ROLE_EDITOR]]
+];
     /**
      * AppFixtures constructor.
      * @param \Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface $passwordEncoder
@@ -54,7 +54,7 @@ class AppFixtures extends Fixture
             $blogPost->setContent($this->faker->realText(200));
             $blogPost->setSlug("first-post");
             $blogPost->setPublished($this->faker->dateTime);
-            $authorReference = $this->getRandomUserReference();
+            $authorReference = $this->getRandomUserReference($blogPost);
             $blogPost->setAuthor($authorReference);
             $this->setReference("blog_post_$i",$blogPost);
             $manager->persist($blogPost);
@@ -69,7 +69,7 @@ class AppFixtures extends Fixture
                 $comment = new Comment();
                 $comment->setContent($this->faker->realText(100));
                 $comment->setPublished($this->faker->dateTime);
-                $authorReference = $this->getRandomUserReference();
+                $authorReference = $this->getRandomUserReference($comment);
                 $comment->setAuthor($authorReference);
                 $comment->setBlogPost($this->getReference("blog_post_$i"));
                 $manager->persist($comment);
@@ -85,6 +85,7 @@ class AppFixtures extends Fixture
             $user->setEmail($USER['email']);
             $user->setFullname($USER['name']);
             $user->setPassword($this->passwordEncoder->encodePassword($user,$USER['password']));
+            $user->setRoles($USER['roles']);
             $this->addReference('user_'.$USER['username'],$user);
             $manager->persist($user);
             $manager->flush();
@@ -94,8 +95,28 @@ class AppFixtures extends Fixture
     /**
      * @return User
      */
-    protected function  getRandomUserReference(): User
+    protected function  getRandomUserReference($entity): User
     {
-        return $this->getReference('user_'.self::USERS[rand(0,3)]['username']);
+        $randomUser = self::USERS[rand(0,3)];
+
+        if($entity instanceof BlogPost and !count(
+            array_intersect($randomUser['roles'],
+                [User::ROLE_SUPER_ADMIN,User::ROLE_ADMIN,User::ROLE_WRITER]
+                )
+            )){
+            return $this->getRandomUserReference($entity);
+        }
+
+        if($entity instanceof Comment and !count(
+                array_intersect($randomUser['roles'],
+                    [User::ROLE_SUPER_ADMIN,User::ROLE_ADMIN,User::ROLE_WRITER,User::ROLE_COMMENTATOR]
+                )
+            )){
+            return $this->getRandomUserReference($entity);
+        }
+
+        return $this->getReference('user_'.$randomUser['username']);
+
     }
+
 }
